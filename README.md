@@ -1,2 +1,2 @@
 # StudyLink
-Shera WebApp uwu!!
+Shera WebApp!! uwu
