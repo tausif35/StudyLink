@@ -2,6 +2,7 @@ require('dotenv').config()
 const express = require("express");
 const bodyParser = require("body-parser");
 const GoogleStrategy = require( 'passport-google-oauth2' ).Strategy;
+const FacebookStrategy = require("passport-facebook").Strategy;
 const findOrCreate =require("mongoose-findorcreate");
 
 const app = express();
@@ -43,7 +44,8 @@ const userSchema=new mongoose.Schema({
     password:String,
     fullname:String,
     type:String,
-    googleId:String
+    googleId:String,
+    facebookId:String
 })
 
 userSchema.plugin(passportLocalMongoose);
@@ -77,6 +79,17 @@ passport.use(new GoogleStrategy({
     });
   }
 ));
+passport.use(new FacebookStrategy({
+    clientID: "398098734930307",
+    clientSecret: "a55211ddd41d4985c1a34def2d4b0649",
+    callbackURL: "http://localhost:3000/auth/facebook/callback"
+  },
+  function(accessToken, refreshToken, profile, cb) {
+    User.findOrCreate({ facebookId: profile.id }, function (err, user) {
+      return cb(err, user);
+    });
+  }
+));
 
 app.get("/",function(req,res){
     if(req.isAuthenticated()){
@@ -95,6 +108,16 @@ app.get( '/auth/google/secrets',
         successRedirect: '/home',
         failureRedirect: '/login'
 }));
+
+app.get('/auth/facebook',
+  passport.authenticate('facebook'));
+
+  app.get('/auth/facebook/callback',
+  passport.authenticate('facebook', { failureRedirect: '/login' }),
+  function(req, res) {
+    // Successful authentication, redirect home.
+    res.redirect('/home');
+  });
 
 app.get("/login",function(req,res){
     res.render("login")
