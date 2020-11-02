@@ -80,8 +80,8 @@ passport.use(new GoogleStrategy({
   }
 ));
 passport.use(new FacebookStrategy({
-    clientID: "398098734930307",
-    clientSecret: "a55211ddd41d4985c1a34def2d4b0649",
+    clientID: process.env.CLIENT_ID_FACEBOOK,
+    clientSecret: process.env.CLIENT_SECRET_FACEBOOK,
     callbackURL: "http://localhost:3000/auth/facebook/callback"
   },
   function(accessToken, refreshToken, profile, cb) {
