@@ -8,11 +8,11 @@ const findOrCreate =require("mongoose-findorcreate");
 const app = express();
 app.use(bodyParser.urlencoded({extended:true}))
 const mongoose=require("mongoose");
-var validator = require('validator');
+const validator = require('validator');
 const session = require('express-session');
 const passport=require("passport")
 const nodemailer = require("nodemailer");
-
+const generator = require('generate-password');
 
 const passportLocalMongoose=require("passport-local-mongoose");
 app.set("view engine","ejs");
@@ -75,7 +75,7 @@ passport.use(new GoogleStrategy({
   },
   function(request, accessToken, refreshToken, profile, done) {
     User.findOrCreate({ googleId: profile.id }, function (err, user) {
-      return done(err, user);
+        return done(err, user);
     });
   }
 ));
@@ -105,9 +105,10 @@ app.get('/auth/google',
 
 app.get( '/auth/google/secrets',
     passport.authenticate( 'google', {
-        successRedirect: '/home',
+        successRedirect: '/information',
         failureRedirect: '/login'
 }));
+
 
 app.get('/auth/facebook',
   passport.authenticate('facebook'));
@@ -118,6 +119,24 @@ app.get('/auth/facebook',
     // Successful authentication, redirect home.
     res.redirect('/home');
   });
+
+app.get("/information",function(req,res){
+    if(req.isAuthenticated()){
+        if(!req.user.type){
+            res.render("test")
+        }else{
+            res.redirect("/home")
+        }
+    }    
+})
+app.post("/information",function(req,res){
+    req.user.fullname=req.body.fullname;
+    req.user.username=req.body.username;
+    req.user.type=req.body.type;
+    req.user.save()
+    res.redirect("/home")
+})
+
 
 app.get("/login",function(req,res){
     res.render("login")
@@ -154,16 +173,22 @@ app.post("/forgot",function(req,res){
     var transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-          user: 'abdulbari3090ti@gmail.com',
-          pass: 'abdulbari1'
+          user: 'teampaimon@gmail.com',
+          pass: 'paimonialneeds'
         }
       });
-      
+
+      var generator = require('generate-password');
+ 
+var password = generator.generate({
+    length: 10,
+    numbers: true
+});
       var mailOptions = {
-        from: 'abdulbari3090ti@gmail.com',
-        to: 'fassterthanflash@gmail.com',
-        subject: 'Sending Email using Node.js',
-        text: 'That was easy!'
+        from: 'teampaimon@gmail.com',
+        to: req.body.email,
+        subject: 'your new password',
+        text: "Your new password is: "+password
       };
       
       transporter.sendMail(mailOptions, function(error, info){
@@ -173,6 +198,16 @@ app.post("/forgot",function(req,res){
           console.log('Email sent: ' + info.response);
         }
       });
+      User.findOne({email:req.body.email},function(err,sanitizedUser){
+        if (sanitizedUser){
+            sanitizedUser.setPassword(password, function(){
+                sanitizedUser.save();
+                res.status(200).json({message: 'Password reset successful.Check email for your new password and login again'});
+            });
+        } else {
+            res.status(500).json({message: 'This user does not exist'});
+        }
+      })
 })
 
 app.post("/login",function(req,res){
