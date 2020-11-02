@@ -10,6 +10,7 @@
     "email-verifier": "^0.4.1",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
+    "generate-password": "^1.5.1",
     "mongoose": "^5.10.11",
     "nodemailer": "^6.4.14",
     "nodemon": "^2.0.6",
