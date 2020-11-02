@@ -73,7 +73,7 @@ passport.use(new GoogleStrategy({
   },
   function(request, accessToken, refreshToken, profile, done) {
     User.findOrCreate({ googleId: profile.id }, function (err, user) {
-      return done(err, user);
+        return done(err, user);
     });
   }
 ));
@@ -92,9 +92,26 @@ app.get('/auth/google',
 
 app.get( '/auth/google/secrets',
     passport.authenticate( 'google', {
-        successRedirect: '/home',
+        successRedirect: '/information',
         failureRedirect: '/login'
 }));
+
+app.get("/information",function(req,res){
+    if(req.isAuthenticated()){
+        if(!req.user.type){
+            res.render("test")
+        }else{
+            res.redirect("/home")
+        }
+    }    
+})
+app.post("/information",function(req,res){
+    req.user.fullname=req.body.fullname;
+    req.user.username=req.body.username;
+    req.user.type=req.body.type;
+    req.user.save()
+    res.redirect("/home")
+})
 
 app.get("/login",function(req,res){
     res.render("login")
