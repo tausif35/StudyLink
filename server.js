@@ -60,16 +60,16 @@ const userSchema=new mongoose.Schema({
     facebookId:String
 })
 
-const questionSchema=new mongoose.Schema({
-    questions:[],
-})
+// const questionSchema=new mongoose.Schema({
+//     questions:[],
+// })
 
 userSchema.plugin(passportLocalMongoose);
 userSchema.plugin(findOrCreate);
 
 
 const User=new mongoose.model("User",userSchema)
-const Question=new mongoose.model("Question",questionSchema)
+// const Question=new mongoose.model("Question",questionSchema)
 passport.use(User.createStrategy());
 
 
@@ -171,65 +171,65 @@ app.get("/home",function(req,res){
 app.get("/forgot",function(req,res){
     res.render("forgot")
 })
-app.get("/question/:topic",function(req,res){
-    if(req.isAuthenticated() && req.user.type==="teacher"){
-        const id=req.params.topic;
-        Question.findById(id, function (err, qs) {
-            if(!qs){
-                res.send("wrong link.try again")
-            }else{
-                res.render("createQs",{topic:id})
-            }
-        })
-    }else{
-        if(req.user.type!=="teacher"){
-            res.send("tui hala chatro")
-        }else{
-            res.redirect("signup")
-        }
-    }
-})
-app.get("/questionpaper/:topic",function(req,res){
-    if(req.isAuthenticated()){
-        const id=req.params.topic;
-        Question.findById(id, function (err, qs) {
-            if(!qs){
-                res.send("wrong link.try again")
-            }else{
-                res.render("questionpaper",{qs:qs.questions})
-            }
-        })
-    }
-})
-app.post("/makeqs", upload.array('file', 12),function(req,res){
-    const id=req.body.id
-    // if(req.file){const obj={
-    //     originalName:req.file.originalname,
-    //     mimeType:req.file.mimetype,
-    //     size:req.file.size,
-    //     fileName:req.file.filename
-    // }}else{
-    //     obj=null;
-    // }
-    // const obj1={
-    //     question:req.body.qs,
-    //     file:obj,
-    //     mark:req.body.mark
-    // }
-    // if(req.body.btn==="add"){
-    //     Question.findById(id, function (err, qs) {
-    //         if(err){
-    //             res.send("err")
-    //         }else{
-    //             qs.questions.push(obj1)
-    //             qs.save()
-    //             res.redirect("/questionPaper/"+id)
-    //         }
-    //     })
-    // }
+// app.get("/question/:topic",function(req,res){
+//     if(req.isAuthenticated() && req.user.type==="teacher"){
+//         const id=req.params.topic;
+//         Question.findById(id, function (err, qs) {
+//             if(!qs){
+//                 res.send("wrong link.try again")
+//             }else{
+//                 res.render("createQs",{topic:id})
+//             }
+//         })
+//     }else{
+//         if(req.user.type!=="teacher"){
+//             res.send("tui hala chatro")
+//         }else{
+//             res.redirect("signup")
+//         }
+//     }
+// })
+// app.get("/questionpaper/:topic",function(req,res){
+//     if(req.isAuthenticated()){
+//         const id=req.params.topic;
+//         Question.findById(id, function (err, qs) {
+//             if(!qs){
+//                 res.send("wrong link.try again")
+//             }else{
+//                 res.render("questionpaper",{qs:qs.questions})
+//             }
+//         })
+//     }
+// })
+// app.post("/makeqs", upload.array('file', 12),function(req,res){
+//     const id=req.body.id
+//     if(req.file){const obj={
+//         originalName:req.file.originalname,
+//         mimeType:req.file.mimetype,
+//         size:req.file.size,
+//         fileName:req.file.filename
+//     }}else{
+//         obj=null;
+//     }
+//     const obj1={
+//         question:req.body.qs,
+//         file:obj,
+//         mark:req.body.mark
+//     }
+//     if(req.body.btn==="add"){
+//         Question.findById(id, function (err, qs) {
+//             if(err){
+//                 res.send("err")
+//             }else{
+//                 qs.questions.push(obj1)
+//                 qs.save()
+//                 res.redirect("/questionPaper/"+id)
+//             }
+//         })
+//     }
 
-    console.log(req)
-})
+//     console.log(req.files)
+// })
 
 app.post("/signup",function(req,res){
     User.register({username:req.body.username,email:req.body.email,type:req.body.type,fullname:req.body.fullname}, req.body.password, function(err,user){
@@ -339,17 +339,17 @@ app.post("/logout",function(req,res){
     res.redirect("/login");
 })
 
-app.post("/redirect",function(req,res){
-    if(req.body.btn==="makeqs"){
-        Question.create({ questions:[] }, function (err, qs) {
-            if (err) return handleError(err);
-            else{
-                qs.save()
-                res.redirect("/question/"+qs.id)
-            }
-          });
-    }
-})
+// app.post("/redirect",function(req,res){
+//     if(req.body.btn==="makeqs"){
+//         Question.create({ questions:[] }, function (err, qs) {
+//             if (err) return handleError(err);
+//             else{
+//                 qs.save()
+//                 res.redirect("/question/"+qs.id)
+//             }
+//           });
+//     }
+// })
 
 
 
